@@ -30,6 +30,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       jpegoptim \
       optipng \
       pngquant \
+      # php7.3 needs zlib1g-dev and libzip-dev for the zip extension
+      # https://github.com/docker-library/php/issues/61#issuecomment-468874705
+      zlib1g-dev \
+      libzip-dev \
       # for git
       git \
       # for composer
