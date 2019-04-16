@@ -93,30 +93,9 @@ CMD ["apache2-foreground-enhanced"]
 # /common-php70
 
 # Install development tools.
-# We install nvm, but also add node to $PATH directly
-# so we can use it through /bin/sh.
-ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION v6.11.0
-ENV NODE_PATH $NVM_DIR/versions/node/$NODE_VERSION/lib/node_modules
-ENV PATH $NVM_DIR/versions/node/$NODE_VERSION/bin:$PATH
-ENV PHANTOMJS_VERSION 2.1.1
-
 RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
   && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini \
-  # Nodejs, installed globally via nvm for all bash users.
-  && curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | PROFILE=/etc/bash.bashrc bash \
-  && . $NVM_DIR/nvm.sh \
-  && nvm install $NODE_VERSION \
-  && npm install -g yarn \
-  # Install Gulp
-  && npm install -g gulp \
-  # Install PhantomJS
-  && apt-get update \
-  # Install fonts and libtdl (for mounted docker binary usage)
-  && apt-get install -y libfontconfig libltdl7 \
-  && curl -sL "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64.tar.bz2" | tar jx \
-	&& mv phantomjs-${PHANTOMJS_VERSION}-linux-x86_64 /usr/local/bin/phantomjs \
 	# Install Blackfire Probe
 	&& version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
   && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
@@ -134,7 +113,19 @@ RUN pecl install xdebug \
   && composer --working-dir=/usr/share/terminus require pantheon-systems/terminus --prefer-dist \
   && rm -r /root/.composer/cache \
   # Clean up the leftovers
-	&& npm cache clean --force \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# NodeJS,
+RUN apt-get update \
+  && apt-get install -y apt-transport-https lsb-release gnupg > /dev/null 2>&1 \
+  && curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
+  && echo 'deb https://deb.nodesource.com/node_10.x stretch main' > /etc/apt/sources.list.d/nodesource.list \
+  && echo 'deb-src https://deb.nodesource.com/node_10.x stretch main' >> /etc/apt/sources.list.d/nodesource.list \
+  && apt-get update \
+  && apt-get install -y nodejs \
+  && npm install -g yarn gulp \
+  && npm cache clean --force \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && npm cache clean --force
 
 COPY test-dev.sh /test.sh
