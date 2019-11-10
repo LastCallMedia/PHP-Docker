@@ -13,5 +13,7 @@ jobs:
       - name: Build Image
         run: docker build -t lastcallmedia/php:${{ matrix.version }} ./${{ matrix.version }}
       - name: Test Image
-        uses: docker://gcr.io/gcp-runtimes/container-structure-test:latest
-        run: container-structure-test test --image lastcallmedia/php:${{ matrix.version }} --config ./${{ matrix.version }}/test.yml --save
+        uses: brpaz/structure-tests-action@v1
+        with:
+          image: lastcallmedia/php:${{ matrix.version }}
+          configFile: ./${{ matrix.version }}/test.yml
