@@ -1,85 +1,26 @@
 version: '2'
 services:
-  php54:
-    image: lastcallmedia/php:5.4
-    build:
-      context: ./php54
-      dockerfile: Dockerfile
-
-  php54_dev:
-    image: lastcallmedia/php:5.4-dev
-    build:
-      context: ./php54
-      dockerfile: Dockerfile.dev
-
-  php55:
-    image: lastcallmedia/php:5.5
-    build:
-      context: ./php55
-      dockerfile: Dockerfile
-
-  php55_dev:
-    image: lastcallmedia/php:5.5-dev
-    build:
-      context: ./php55
-      dockerfile: Dockerfile.dev
-
-  php56:
-    image: lastcallmedia/php:5.6
-    build:
-      context: ./php56
-      dockerfile: Dockerfile
-
-  php56_dev:
-    image: lastcallmedia/php:5.6-dev
-    build:
-      context: ./php56
-      dockerfile: Dockerfile.dev
-
-  php70:
+  "7.0":
     image: lastcallmedia/php:7.0
-    build:
-      context: ./php70
-      dockerfile: Dockerfile
-
-  php70_dev:
+    build: ./7.0
+  "7.0-dev":
     image: lastcallmedia/php:7.0-dev
-    build:
-      context: ./php70
-      dockerfile: Dockerfile.dev
-
-  php71:
-      image: lastcallmedia/php:7.1
-      build:
-        context: ./php71
-        dockerfile: Dockerfile
-
-  php71_dev:
+    build: ./7.0-dev 
+  "7.1":
+    image: lastcallmedia/php:7.1
+    build: ./7.1
+  "7.1-dev":
     image: lastcallmedia/php:7.1-dev
-    build:
-      context: ./php71
-      dockerfile: Dockerfile.dev
-
-  php72:
-      image: lastcallmedia/php:7.2
-      build:
-        context: ./php72
-        dockerfile: Dockerfile
-
-  php72_dev:
+    build: ./7.1-dev 
+  "7.2":
+    image: lastcallmedia/php:7.2
+    build: ./7.2
+  "7.2-dev":
     image: lastcallmedia/php:7.2-dev
-    build:
-      context: ./php72
-      dockerfile: Dockerfile.dev
-
-  php73:
-      image: lastcallmedia/php:7.3
-      build:
-        context: ./php73
-        dockerfile: Dockerfile
-
-  php73_dev:
+    build: ./7.2-dev 
+  "7.3":
+    image: lastcallmedia/php:7.3
+    build: ./7.3
+  "7.3-dev":
     image: lastcallmedia/php:7.3-dev
-    build:
-      context: ./php73
-      dockerfile: Dockerfile.dev
+    build: ./7.3-dev 
