@@ -10,9 +10,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v1
-      - name: Install Container Structure Test
-        run: curl -LO https://storage.googleapis.com/container-structure-test/v1.8.0/container-structure-test-linux-amd64 && chmod +x container-structure-test-linux-amd64 && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
       - name: Build Image
         run: docker build -t lastcallmedia/php:${{ matrix.version }} ./${{ matrix.version }}
       - name: Test Image
-        run: container-structure-test test --image lastcallmedia/php:${{ matrix.version }} --config ./${{ matrix.version }}/test.yml
+        uses: docker://gcr.io/gcp-runtimes/container-structure-test:latest
+        run: container-structure-test test --image lastcallmedia/php:${{ matrix.version }} --config ./${{ matrix.version }}/test.yml --save
