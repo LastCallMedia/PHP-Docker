@@ -1,0 +1,18 @@
+name: 'Container Structure Tests'
+inputs:
+  image:
+    description: 'The Docker image to test'
+    required: true
+  config:
+    description: 'Path to the config file'
+    default: 'test.yaml'
+runs:
+  using: 'docker'
+  image: 'gcr.io/gcp-runtimes/container-structure-test:latest'
+  args:
+    - test
+    - --image
+    - ${{ inputs.image }}
+    - --config
+    - ${{ inputs.config }}
+
