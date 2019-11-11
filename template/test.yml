@@ -1,7 +1,7 @@
 schemaVersion: "2.0.0"
 commandTests:
   - name: "php should be configurable by environment variables"
-    setup: [["lcm-php-entrypoint"]]
+    setup: [["docker-php-entrypoint"]]
     envVars:
       - {key: PHP_MEMORY_LIMIT, value: 512M }
       - {key: SENDMAIL_PATH, value: /bin/true }
@@ -13,7 +13,7 @@ commandTests:
       - sendmail_path => /bin/true => /bin/true
       - date.timezone => America/New_York => America/New_York
   - name: "php should use have default values"
-    setup: [["lcm-php-entrypoint"]]
+    setup: [["docker-php-entrypoint"]]
     command: "php"
     args: ["-i"]
     expectedOutput:
@@ -38,13 +38,13 @@ commandTests:
   - name: "XDebug should be installed and disabled by default"
     command: "php"
     args: ["-m"]
-    setup: [["lcm-php-entrypoint"]]
+    setup: [["docker-php-entrypoint"]]
     excludedOutput:
       - Xdebug
   - name: "XDebug should be enableable using a simple environment variable"
     command: "php"
     args: ["-m"]
-    setup: [["lcm-php-entrypoint"]]
+    setup: [["docker-php-entrypoint"]]
     envVars:
       - {key: XDEBUG_ENABLE, value: True }
     expectedOutput:
@@ -52,7 +52,7 @@ commandTests:
   - name: "XDebug should be configurable by using environment variables"
     command: "php"
     args: ["-i"]
-    setup: [["lcm-php-entrypoint"]]
+    setup: [["docker-php-entrypoint"]]
     envVars:
       - {key: XDEBUG_ENABLE, value: True }
       - {key: XDEBUG_REMOTE_HOST, value: foo.bar}

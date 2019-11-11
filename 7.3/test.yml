@@ -1,7 +1,7 @@
 schemaVersion: "2.0.0"
 commandTests:
   - name: "php should be configurable by environment variables"
-    setup: [["lcm-php-entrypoint"]]
+    setup: [["docker-php-entrypoint"]]
     envVars:
       - {key: PHP_MEMORY_LIMIT, value: 512M }
       - {key: SENDMAIL_PATH, value: /bin/true }
@@ -13,7 +13,7 @@ commandTests:
       - sendmail_path => /bin/true => /bin/true
       - date.timezone => America/New_York => America/New_York
   - name: "php should use have default values"
-    setup: [["lcm-php-entrypoint"]]
+    setup: [["docker-php-entrypoint"]]
     command: "php"
     args: ["-i"]
     expectedOutput:

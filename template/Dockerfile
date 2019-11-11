@@ -98,8 +98,7 @@ RUN curl -fsSOL https://github.com/drush-ops/drush-launcher/releases/download/$D
 RUN ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
 
 ADD templates /templates
-ADD scripts/* /usr/local/bin/
-ENTRYPOINT ["lcm-php-entrypoint"]
+
 # /common-php70
 {{ if .Env.IS_DEV }}
 # NodeJS + Yarn
@@ -144,3 +143,4 @@ RUN curl -fsSOL https://github.com/pantheon-systems/terminus/releases/download/$
 RUN npm i --no-cache -g gulp-cli
 ADD Dockerfile /tmp
 {{ end }}
+ADD scripts/* /usr/local/bin/
