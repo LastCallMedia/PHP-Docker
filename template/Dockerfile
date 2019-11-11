@@ -142,4 +142,5 @@ RUN curl -fsSOL https://github.com/pantheon-systems/terminus/releases/download/$
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli
+ADD Dockerfile /tmp
 {{ end }}
