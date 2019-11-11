@@ -8,7 +8,7 @@ They all offer the following tools:
 * PHP (with MySQL support, sqlite, GD, curl, mcrypt and an OpCode cache)
 * Apache, configured to serve /var/www with an exposed port on 80
 * Composer
-* Drush
+* Drush Launcher
 
 Environment Variables
 ---------------------
@@ -23,15 +23,7 @@ Debugging
 The *-dev containers are intended for use in development environments only.  They include several extra tools that are not appropriate for production sites.
 
 ### Xdebug
-To enable xdebug, mount an .ini file as `/usr/local/etc/php/conf.d/xdebug.ini`.  Recommended configuration:
-
-```ini
-xdebug.remote_enable=on
-xdebug.remote_autostart=off
-; Replace with the actual public IP address of your Docker host:
-xdebug.remote_host=X.X.X.X
-```
-Using this configuration, XDebug will initiate a connection back to the Docker host on port 9000 anytime you visit a page with an `XDEBUG_SESSION_START` GET parameter.  For more information, see the [XDebug documentation](https://xdebug.org/docs/remote#starting).
+To enable XDebug, set the `XDEBUG_ENABLE` environment variable. In most situations, this should be sufficient to allow remote debugging, but you may also find a need to change the `xdebug.remote_host` variable, which is set to `docker.host.internal` by default.
 
 ### Blackfire
 The Blackfire PHP probe is installed on all of the -dev boxes.  It is configured to connect to a Blackfire `agent` container running alongside at blackfire:8707. See the [Blackfire documentation](https://blackfire.io/docs/integrations/docker) for more information on setting this up.
