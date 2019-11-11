@@ -15,4 +15,5 @@ runs:
     - ${{ inputs.image }}
     - --config
     - ${{ inputs.config }}
+    - --save
 

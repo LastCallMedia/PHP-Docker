@@ -20,8 +20,14 @@ jobs:
         uses: actions/checkout@v1
       - name: Build Image
         run: docker build -t lastcallmedia/php:${{ matrix.version }} ./${{ matrix.version }}
-      - name: Test Image
+      - name: Unit Test Image
         uses: ./.github/actions/container-structure-test
         with:
           image: lastcallmedia/php:${{ matrix.version }}
           config: ./${{ matrix.version }}/test.yml
+      - name: "Verify image starts Apache"
+        run: |
+          IMG=$(docker run -d -p 8080:80 lastcallmedia/php:${{ matrix.version }})
+          sleep 3
+          curl -I http://localhost:8080
+          docker stop $IMG
