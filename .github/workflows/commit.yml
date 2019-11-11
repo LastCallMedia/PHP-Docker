@@ -2,32 +2,43 @@ name: Commit
 on: [push]
 
 jobs:
-  build:
+#  build:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        version:
+#          - "7.0"
+#          - "7.0-dev"
+#          - "7.1"
+#          - "7.1-dev"
+#          - "7.2"
+#          - "7.2-dev"
+#          - "7.3"
+#          - "7.3-dev"
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v1
+#      - name: Build Image
+#        run: docker build -t lastcallmedia/php:${{ matrix.version }} ./${{ matrix.version }}
+#      - name: Unit Test Image
+#        uses: ./.github/actions/container-structure-test
+#        with:
+#          image: lastcallmedia/php:${{ matrix.version }}
+#          config: ./${{ matrix.version }}/test.yml
+#      - name: "Verify image starts Apache"
+#        run: |
+#          IMG=$(docker run -d -p 8080:80 lastcallmedia/php:${{ matrix.version }})
+#          sleep 3
+#          curl -I http://localhost:8080
+#          docker stop $IMG
+  check-template:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        version:
-          - "7.0"
-          - "7.0-dev"
-          - "7.1"
-          - "7.1-dev"
-          - "7.2"
-          - "7.2-dev"
-          - "7.3"
-          - "7.3-dev"
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v1
-      - name: Build Image
-        run: docker build -t lastcallmedia/php:${{ matrix.version }} ./${{ matrix.version }}
-      - name: Unit Test Image
-        uses: ./.github/actions/container-structure-test
+      - name: Setup dockerize
+        uses: zcong1993/setup-dockerize@v1.1.0
         with:
-          image: lastcallmedia/php:${{ matrix.version }}
-          config: ./${{ matrix.version }}/test.yml
-      - name: "Verify image starts Apache"
-        run: |
-          IMG=$(docker run -d -p 8080:80 lastcallmedia/php:${{ matrix.version }})
-          sleep 3
-          curl -I http://localhost:8080
-          docker stop $IMG
+          dockerize-version: '0.6.1'
+      - name: Run regenerate
+        run: ./regenerate.sh
+      - name: Check diff
+        run: [[ -z $(git status --porcelain) ]] || { echo "Changes detected to template that are not reflected in the repository."; exit 1; }
