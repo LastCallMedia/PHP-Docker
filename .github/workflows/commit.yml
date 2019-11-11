@@ -6,7 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: ["7.0", "7.1", "7.2", "7.3"]
+        version:
+          - "7.0"
+          - "7.0-dev"
+          - "7.1"
+          - "7.1-dev"
+          - "7.2"
+          - "7.2-dev"
+          - "7.3"
+          - "7.3-dev"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v1
