@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 #####
 #
 # This shell script regenerates all images based on the "template."
