@@ -41,4 +41,4 @@ jobs:
       - name: Run regenerate
         run: ./regenerate.sh
       - name: Check diff
-        run: [[ -z $(git status --porcelain) ]] || { echo "Changes detected to template that are not reflected in the repository."; exit 1; }
+        run: '[[ -z $(git status --porcelain) ]] || { echo "Changes detected to template that are not reflected in the repository."; exit 1; }'
