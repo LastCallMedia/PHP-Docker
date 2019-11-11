@@ -1,0 +1,28 @@
+name: Publish
+on:
+  push:
+    branches: [master]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version:
+          - "7.0"
+          - "7.0-dev"
+          - "7.1"
+          - "7.1-dev"
+          - "7.2"
+          - "7.2-dev"
+          - "7.3"
+          - "7.3-dev"
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v1
+      - name: Docker Hub Login
+        run: docker login -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PASSWORD}}
+      - name: Build Image
+        run: docker build -t lastcallmedia/php:${{ matrix.version }} ./${{ matrix.version }}
+      - name: Push Image
+        run: docker push lastcallmedia/php:${{ matrix.version }}
