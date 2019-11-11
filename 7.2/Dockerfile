@@ -98,7 +98,7 @@ RUN curl -fsSOL https://github.com/drush-ops/drush-launcher/releases/download/$D
 RUN ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
 
 ADD templates /templates
+ADD scripts/* /usr/local/bin/
 
 # /common-php70
 
-ADD scripts/* /usr/local/bin/
