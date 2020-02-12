@@ -117,7 +117,7 @@ RUN apt-get update \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # XDebug
-RUN pecl install xdebug \
+RUN pecl install xdebug-2.9.0 \
   && docker-php-ext-enable xdebug \
   && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini
 
