@@ -1,4 +1,4 @@
-FROM php:{{ .Env.PHP_VERSION }}-apache
+FROM php:7.4-apache
 
 # common-php70
 ENV DEBIAN_FRONTEND noninteractive
@@ -37,7 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       unzip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN docker-php-ext-configure gd {{if (lt (atoi .Env.PHP_MINOR_VERSION) 4)}}--with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/{{ end }} \
+RUN docker-php-ext-configure gd  \
     && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
     && docker-php-ext-install -j$(nproc) \
       bcmath \
@@ -101,45 +101,4 @@ ADD templates /templates
 ADD scripts/* /usr/local/bin/
 
 # /common-php70
-{{ if .Env.IS_DEV }}
-# NodeJS + Yarn
-ARG NODE_MAJOR_VERSION=10
-RUN apt-get update \
-  && apt-get install -y apt-transport-https lsb-release gnupg > /dev/null 2>&1 \
-  && curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
-  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-  && echo "deb https://deb.nodesource.com/node_$NODE_MAJOR_VERSION.x $(lsb_release --codename | cut -f2) main" > /etc/apt/sources.list.d/nodesource.list \
-  && echo "deb-src https://deb.nodesource.com/node_$NODE_MAJOR_VERSION.x $(lsb_release --codename | cut -f2) main" >> /etc/apt/sources.list.d/nodesource.list \
-  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-  && apt-get update \
-  && apt-get install -y nodejs \
-  && apt-get install -y --no-install-recommends yarn \
-  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# XDebug
-RUN pecl install xdebug \
-  && docker-php-ext-enable xdebug \
-  && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini
-
-# Blackfire Probe. Note: We do not install Blackfire CLI. You will
-# need that in order to trigger Blackfire tests. The probe just instruments
-# things on the server side.
-RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
-    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
-    && mkdir -p /tmp/blackfire \
-    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
-    && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
-    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
-    && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
-
-# Terminus.
-ARG TERMINUS_VERSION=2.2.0
-ARG TERMINUS_SHA256="73fcdf6ceee23731c20bff45f668bde09230af347670a92e5ca97c2c008ae6e0"
-RUN curl -fsSOL https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar \
-  && echo "$TERMINUS_SHA256 terminus.phar" | sha256sum -c - \
-  && mv terminus.phar /usr/local/bin/terminus \
-  && chmod +x /usr/local/bin/terminus
-
-# Gulp-cli.
-RUN npm i --no-cache -g gulp-cli
-{{ end }}

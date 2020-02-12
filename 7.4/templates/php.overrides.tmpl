@@ -1,0 +1,17 @@
+; Set a reasonable max upload size
+upload_max_filesize = 128M
+post_max_size = 128M
+
+; These settings can be overridden at runtime by the presence of environment
+; variables.
+date.timezone={{ default .Env.TZ "UTC" }}
+{{ if .Env.PHP_MEMORY_LIMIT }}memory_limit={{ .Env.PHP_MEMORY_LIMIT }}{{ end }}
+{{ if .Env.SENDMAIL_PATH }}sendmail_path={{ .Env.SENDMAIL_PATH }}{{ end }}
+
+; XDebug can be conditionally triggered.
+{{ if .Env.XDEBUG_ENABLE }}
+xdebug.remote_host={{ default .Env.XDEBUG_REMOTE_HOST "host.docker.internal" }}
+xdebug.idekey={{ default .Env.XDEBUG_IDEKEY "PHPSTORM" }}
+xdebug.remote_enable={{ default .Env.XDEBUG_REMOTE_ENABLE "On" }}
+xdebug.remote_autostart={{ default .Env.XDEBUG_REMOTE_AUTOSTART "On" }}
+{{ end }}

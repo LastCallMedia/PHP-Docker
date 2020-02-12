@@ -1,0 +1,78 @@
+schemaVersion: "2.0.0"
+commandTests:
+  - name: "php should be configurable by environment variables"
+    setup: [["docker-php-entrypoint"]]
+    envVars:
+      - {key: PHP_MEMORY_LIMIT, value: 512M }
+      - {key: SENDMAIL_PATH, value: /bin/true }
+      - {key: TZ, value: America/New_York }
+    command: "php"
+    args: ["-i"]
+    expectedOutput:
+      - memory_limit => 512M => 512M
+      - sendmail_path => /bin/true => /bin/true
+      - date.timezone => America/New_York => America/New_York
+  - name: "php should use have default values"
+    setup: [["docker-php-entrypoint"]]
+    command: "php"
+    args: ["-i"]
+    expectedOutput:
+      - memory_limit => 128M => 128M
+      - sendmail_path =>  -t -i  =>  -t -i
+      - date.timezone => UTC => UTC
+  - name: "Composer should work"
+    command: composer
+    args: ["diagnose"]
+  - name: "Drush should be launchable"
+    command: drush
+    args: ["--drush-launcher-version"]
+    expectedOutput:
+      - "Drush Launcher Version: 0.6.0"
+
+  - name: "Blackfire agent should be present and configured"
+    command: "php"
+    args: ["-i"]
+    expectedOutput:
+      - Blackfire => enabled
+      - blackfire.agent_socket => tcp://blackfire:8707 => tcp://blackfire:8707
+  - name: "XDebug should be installed and disabled by default"
+    command: "php"
+    args: ["-m"]
+    setup: [["docker-php-entrypoint"]]
+    excludedOutput:
+      - Xdebug
+  - name: "XDebug should be enableable using a simple environment variable"
+    command: "php"
+    args: ["-m"]
+    setup: [["docker-php-entrypoint"]]
+    envVars:
+      - {key: XDEBUG_ENABLE, value: True }
+    expectedOutput:
+      - Xdebug
+  - name: "XDebug should be configurable by using environment variables"
+    command: "php"
+    args: ["-i"]
+    setup: [["docker-php-entrypoint"]]
+    envVars:
+      - {key: XDEBUG_ENABLE, value: True }
+      - {key: XDEBUG_REMOTE_HOST, value: foo.bar}
+      - {key: XDEBUG_IDEKEY, value: foobar}
+      - {key: XDEBUG_REMOTE_ENABLE, value: 1}
+      - {key: XDEBUG_REMOTE_AUTOSTART, value: 1}
+    expectedOutput:
+      - xdebug.remote_autostart => On => On
+      - xdebug.remote_enable => On => On
+      - xdebug.remote_host => foo.bar => foo.bar
+      - xdebug.idekey => foobar => foobar
+  - name: "NodeJS Should be installed and in the correct version"
+    command: "node"
+    args: ["--version"]
+    expectedOutput:
+      - v10.
+  - name: "Yarn should be installed and functional"
+    command: "yarn"
+    args: ["--version"]
+  - name: "Terminus should be installed and functional"
+    command: "terminus"
+    args: ["self:info"]
+

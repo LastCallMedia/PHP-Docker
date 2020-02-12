@@ -17,6 +17,8 @@ jobs:
           - "7.2-dev"
           - "7.3"
           - "7.3-dev"
+          - "7.4"
+          - "7.4-dev"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v1

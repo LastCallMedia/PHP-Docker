@@ -24,3 +24,9 @@ services:
   "7.3-dev":
     image: lastcallmedia/php:7.3-dev
     build: ./7.3-dev 
+  "7.4":
+    image: lastcallmedia/php:7.4
+    build: ./7.4
+  "7.4-dev":
+    image: lastcallmedia/php:7.4-dev
+    build: ./7.4-dev 

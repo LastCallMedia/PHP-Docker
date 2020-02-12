@@ -1,4 +1,4 @@
-FROM php:{{ .Env.PHP_VERSION }}-apache
+FROM php:7.4-apache
 
 # common-php70
 ENV DEBIAN_FRONTEND noninteractive
@@ -37,7 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       unzip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN docker-php-ext-configure gd {{if (lt (atoi .Env.PHP_MINOR_VERSION) 4)}}--with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/{{ end }} \
+RUN docker-php-ext-configure gd  \
     && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
     && docker-php-ext-install -j$(nproc) \
       bcmath \
@@ -101,7 +101,7 @@ ADD templates /templates
 ADD scripts/* /usr/local/bin/
 
 # /common-php70
-{{ if .Env.IS_DEV }}
+
 # NodeJS + Yarn
 ARG NODE_MAJOR_VERSION=10
 RUN apt-get update \
@@ -142,4 +142,4 @@ RUN curl -fsSOL https://github.com/pantheon-systems/terminus/releases/download/$
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli
-{{ end }}
+
