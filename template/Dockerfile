@@ -117,7 +117,6 @@ RUN apt-get update \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # XDebug
-# PHP 7.0 will only build on xdebug 2.9.0 or lower
 RUN pecl install xdebug{{if (eq (atoi .Env.PHP_MINOR_VERSION) 0)}}-2.9.0{{ end }} \
   && docker-php-ext-enable xdebug \
   && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini
