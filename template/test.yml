@@ -68,7 +68,7 @@ commandTests:
     command: "node"
     args: ["--version"]
     expectedOutput:
-      - v10.
+      - v{{if (lt (atoi .Env.PHP_MINOR_VERSION) 4)}}10{{else}}14{{end}}.
   - name: "Yarn should be installed and functional"
     command: "yarn"
     args: ["--version"]
