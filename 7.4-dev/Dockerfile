@@ -103,7 +103,7 @@ ADD scripts/* /usr/local/bin/
 # /common-php70
 
 # NodeJS + Yarn
-ARG NODE_MAJOR_VERSION=10
+ARG NODE_MAJOR_VERSION=14
 RUN apt-get update \
   && apt-get install -y apt-transport-https lsb-release gnupg > /dev/null 2>&1 \
   && curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
