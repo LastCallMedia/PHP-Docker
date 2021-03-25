@@ -70,11 +70,12 @@ RUN a2enmod rewrite headers expires \
   && adduser --uid 1000 --gecos 'My OSX User' --disabled-password osxuser
 
 # Install Composer.
-ARG COMPOSER_VERSION=1.9.1
+
+ARG COMPOSER_VERSION={{if (lt (atoi .Env.PHP_MINOR_VERSION) 4)}}1.10.20{{else}}2.0.11{{end}}
 RUN COMPOSER_SHA384=$(curl https://composer.github.io/installer.sig) \
   && curl -fsSL -o composer-setup.php https://getcomposer.org/installer \
   && echo "$COMPOSER_SHA384 composer-setup.php" | sha384sum -c - \
-  && php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+  && php composer-setup.php --version=$COMPOSER_VERSION --install-dir=/usr/local/bin --filename=composer
 
 # Install Dockerize.
 ARG DOCKERIZE_VERSION=v0.6.1
