@@ -5,28 +5,40 @@ services:
     build: ./7.0
   "7.0-dev":
     image: lastcallmedia/php:7.0-dev
-    build: ./7.0-dev 
+    build: ./7.0-dev
   "7.1":
     image: lastcallmedia/php:7.1
     build: ./7.1
   "7.1-dev":
     image: lastcallmedia/php:7.1-dev
-    build: ./7.1-dev 
+    build: ./7.1-dev
   "7.2":
     image: lastcallmedia/php:7.2
     build: ./7.2
   "7.2-dev":
     image: lastcallmedia/php:7.2-dev
-    build: ./7.2-dev 
+    build: ./7.2-dev
   "7.3":
     image: lastcallmedia/php:7.3
     build: ./7.3
   "7.3-dev":
     image: lastcallmedia/php:7.3-dev
-    build: ./7.3-dev 
+    build: ./7.3-dev
   "7.4":
     image: lastcallmedia/php:7.4
     build: ./7.4
   "7.4-dev":
     image: lastcallmedia/php:7.4-dev
-    build: ./7.4-dev 
+    build: ./7.4-dev
+  "8.0":
+    image: lastcallmedia/php:8.0
+    build: ./8.0
+  "8.0-dev":
+    image: lastcallmedia/php:8.0-dev
+    build: ./8.0-dev
+  "8.1":
+    image: lastcallmedia/php:8.1
+    build: ./8.1
+  "8.1-dev":
+    image: lastcallmedia/php:8.1-dev
+    build: ./8.1-dev

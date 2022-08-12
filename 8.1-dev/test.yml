@@ -28,7 +28,7 @@ commandTests:
     args: ["--drush-launcher-version"]
     expectedOutput:
       - "Drush Launcher Version: 0.6.0"
-{{if .Env.IS_DEV}}
+
   - name: "Blackfire agent should be present and configured"
     command: "php"
     args: ["-i"]
@@ -68,11 +68,11 @@ commandTests:
     command: "node"
     args: ["--version"]
     expectedOutput:
-      - v{{ .Env.NODE_MAJOR_VERSION }}.
+      - v16.
   - name: "Yarn should be installed and functional"
     command: "yarn"
     args: ["--version"]
   - name: "Terminus should be installed and functional"
     command: "terminus"
     args: ["self:info"]
-{{ end }}
+
