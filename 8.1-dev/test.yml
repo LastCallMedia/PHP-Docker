@@ -18,7 +18,7 @@ commandTests:
     args: ["-i"]
     expectedOutput:
       - memory_limit => 128M => 128M
-      - sendmail_path =>  -t -i  =>  -t -i
+      - sendmail_path => (?:\/usr\/sbin\/sendmail)? -t -i\s*=> (?:\/usr\/sbin\/sendmail)? -t -i
       - date.timezone => UTC => UTC
   - name: "Composer should work"
     command: composer
