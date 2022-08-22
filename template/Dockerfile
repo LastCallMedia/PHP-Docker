@@ -134,8 +134,8 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
 # Terminus.
-ARG TERMINUS_VERSION=2.2.0
-ARG TERMINUS_SHA256="73fcdf6ceee23731c20bff45f668bde09230af347670a92e5ca97c2c008ae6e0"
+ARG TERMINUS_VERSION={{ .Env.TERMINUS_VERSION }}
+ARG TERMINUS_SHA256="{{ .Env.TERMINUS_SHA }}"
 RUN curl -fsSOL https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar \
   && echo "$TERMINUS_SHA256 terminus.phar" | sha256sum -c - \
   && mv terminus.phar /usr/local/bin/terminus \

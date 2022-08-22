@@ -53,6 +53,15 @@ for PHP_VERSION in "${php_versions[@]}"; do
     composer_version="1.10.20"
   fi
 
+  # Determine terminus version
+  if version_at_least "$PHP_VERSION" "8.0"; then
+    terminus_version="3.0.7"
+    terminus_sha="f8fd66afb825ba2314a3c1d9a0b0e7e3dedbe687668613bd511ff6b41c4c6516"
+  else
+    terminus_version="2.2.0"
+    terminus_sha="73fcdf6ceee23731c20bff45f668bde09230af347670a92e5ca97c2c008ae6e0"
+  fi
+
   # Configure options changed in 7.4
   # Negate the result, because bash returns `0` for true and `1` for false
   ! version_at_least "$PHP_VERSION" "7.4"
@@ -70,8 +79,8 @@ for PHP_VERSION in "${php_versions[@]}"; do
   devDir="${dir}-dev"
   rm -rf $devDir
   mkdir -p $devDir
-  PHP_VERSION=$PHP_VERSION PHP_MAJOR_VERSION=$major PHP_MINOR_VERSION=$minor PHP_AT_LEAST_7_4=$php_at_least_7_4 COMPOSER_VERSION=$composer_version IS_DEV=true XDEBUG_VERSION_STRING=$xdebug_version_string NODE_MAJOR_VERSION=$node_version dockerize -template template/Dockerfile:$devDir/Dockerfile
-  PHP_VERSION=$PHP_VERSION PHP_MAJOR_VERSION=$major PHP_MINOR_VERSION=$minor PHP_AT_LEAST_7_4=$php_at_least_7_4 COMPOSER_VERSION=$composer_version IS_DEV=true XDEBUG_VERSION_STRING=$xdebug_version_string NODE_MAJOR_VERSION=$node_version dockerize -template template/test.yml:$devDir/test.yml
+  PHP_VERSION=$PHP_VERSION PHP_MAJOR_VERSION=$major PHP_MINOR_VERSION=$minor PHP_AT_LEAST_7_4=$php_at_least_7_4 COMPOSER_VERSION=$composer_version IS_DEV=true XDEBUG_VERSION_STRING=$xdebug_version_string NODE_MAJOR_VERSION=$node_version TERMINUS_VERSION=$terminus_version TERMINUS_SHA=$terminus_sha dockerize -template template/Dockerfile:$devDir/Dockerfile
+  PHP_VERSION=$PHP_VERSION PHP_MAJOR_VERSION=$major PHP_MINOR_VERSION=$minor PHP_AT_LEAST_7_4=$php_at_least_7_4 COMPOSER_VERSION=$composer_version IS_DEV=true XDEBUG_VERSION_STRING=$xdebug_version_string NODE_MAJOR_VERSION=$node_version TERMINUS_VERSION=$terminus_version TERMINUS_SHA=$terminus_sha dockerize -template template/test.yml:$devDir/test.yml
   cp -r template/scripts "$devDir/scripts"
   cp -r template/templates "$devDir/templates"
   dc+="  \"$PHP_VERSION-dev\":\n    image: lastcallmedia/php:$PHP_VERSION-dev\n    build: $devDir\n"
