@@ -4,6 +4,9 @@ set -e
 # Write overrides to PHP and Apache. This is incompatible with starting the container
 # with any user other than root, but that's not advised for the PHP Apache container
 # anyway.
+
+# PHP 7.3 is the first version that uses Xdebug 3; it's easier to check
+# the php version in here than the Xdebug version
 php_at_least_7_3=$(php -r 'echo version_compare(PHP_VERSION, "7.3") >= 0;')
 
 PHP_AT_LEAST_7_3=$php_at_least_7_3 dockerize \
