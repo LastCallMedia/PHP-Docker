@@ -120,7 +120,8 @@ RUN apt-get update \
 # XDebug
 RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
-  && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini
+  && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
+
 
 # Blackfire Probe. Note: We do not install Blackfire CLI. You will
 # need that in order to trigger Blackfire tests. The probe just instruments

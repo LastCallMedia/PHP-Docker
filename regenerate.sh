@@ -30,9 +30,9 @@ for PHP_VERSION in "${php_versions[@]}"; do
 
   # For php versions < 7.3, we need to specify xdebug version
   if version_at_least "$PHP_VERSION" "7.3"; then
-    xdebug_version_string=""
+    xdebug_3="1"
   else
-    xdebug_version_string="-2.9.0"
+    xdebug_3=""
   fi
 
   # Determine node version
@@ -79,8 +79,8 @@ for PHP_VERSION in "${php_versions[@]}"; do
   devDir="${dir}-dev"
   rm -rf $devDir
   mkdir -p $devDir
-  PHP_VERSION=$PHP_VERSION PHP_MAJOR_VERSION=$major PHP_MINOR_VERSION=$minor PHP_AT_LEAST_7_4=$php_at_least_7_4 COMPOSER_VERSION=$composer_version IS_DEV=true XDEBUG_VERSION_STRING=$xdebug_version_string NODE_MAJOR_VERSION=$node_version TERMINUS_VERSION=$terminus_version TERMINUS_SHA=$terminus_sha dockerize -template template/Dockerfile:$devDir/Dockerfile
-  PHP_VERSION=$PHP_VERSION PHP_MAJOR_VERSION=$major PHP_MINOR_VERSION=$minor PHP_AT_LEAST_7_4=$php_at_least_7_4 COMPOSER_VERSION=$composer_version IS_DEV=true XDEBUG_VERSION_STRING=$xdebug_version_string NODE_MAJOR_VERSION=$node_version TERMINUS_VERSION=$terminus_version TERMINUS_SHA=$terminus_sha dockerize -template template/test.yml:$devDir/test.yml
+  PHP_VERSION=$PHP_VERSION PHP_MAJOR_VERSION=$major PHP_MINOR_VERSION=$minor PHP_AT_LEAST_7_4=$php_at_least_7_4 COMPOSER_VERSION=$composer_version IS_DEV=true XDEBUG_3=$xdebug_3 NODE_MAJOR_VERSION=$node_version TERMINUS_VERSION=$terminus_version TERMINUS_SHA=$terminus_sha dockerize -template template/Dockerfile:$devDir/Dockerfile
+  PHP_VERSION=$PHP_VERSION PHP_MAJOR_VERSION=$major PHP_MINOR_VERSION=$minor PHP_AT_LEAST_7_4=$php_at_least_7_4 COMPOSER_VERSION=$composer_version IS_DEV=true XDEBUG_3=$xdebug_3 NODE_MAJOR_VERSION=$node_version TERMINUS_VERSION=$terminus_version TERMINUS_SHA=$terminus_sha dockerize -template template/test.yml:$devDir/test.yml
   cp -r template/scripts "$devDir/scripts"
   cp -r template/templates "$devDir/templates"
   dc+="  \"$PHP_VERSION-dev\":\n    image: lastcallmedia/php:$PHP_VERSION-dev\n    build: $devDir\n"
