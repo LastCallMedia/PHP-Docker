@@ -41,7 +41,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v1
       - name: Setup dockerize
-        uses: zcong1993/setup-dockerize@v1.1.0
+        uses: zcong1993/setup-dockerize@v1.2.2
         with:
           dockerize-version: '0.6.1'
       - name: Run regenerate
