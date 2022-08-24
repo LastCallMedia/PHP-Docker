@@ -10,8 +10,14 @@ date.timezone={{ default .Env.TZ "UTC" }}
 
 ; XDebug can be conditionally triggered.
 {{ if .Env.XDEBUG_ENABLE }}
+{{ if .Env.PHP_AT_LEAST_7_3 }}
+xdebug.client_host={{ default .Env.XDEBUG_REMOTE_HOST "host.docker.internal" }}
+xdebug.idekey={{ default .Env.XDEBUG_IDEKEY "PHPSTORM" }}
+xdebug.start_with_request={{ default .Env.XDEBUG_START_WITH_REQUEST "yes" }}
+{{ else }}
 xdebug.remote_host={{ default .Env.XDEBUG_REMOTE_HOST "host.docker.internal" }}
 xdebug.idekey={{ default .Env.XDEBUG_IDEKEY "PHPSTORM" }}
 xdebug.remote_enable={{ default .Env.XDEBUG_REMOTE_ENABLE "On" }}
 xdebug.remote_autostart={{ default .Env.XDEBUG_REMOTE_AUTOSTART "On" }}
+{{ end }}
 {{ end }}

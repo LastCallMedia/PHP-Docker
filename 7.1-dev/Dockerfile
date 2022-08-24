@@ -113,11 +113,15 @@ RUN apt-get update \
   && echo "deb-src https://deb.nodesource.com/node_$NODE_MAJOR_VERSION.x $(lsb_release --codename | cut -f2) main" >> /etc/apt/sources.list.d/nodesource.list \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && apt-get update \
+  # Force apt to use the deb.nodesource repository
+  && echo "Package: nodejs\nPin: origin deb.nodesource.com\nPin-priority: 1000" > /etc/apt/preferences.d/99-nodejs \
   && apt-get install -y nodejs \
   && apt-get install -y --no-install-recommends yarn \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # XDebug
+# TODO: Remove xdebug next time it causes problems. It is a lot of effort
+# to maintain, and no one is actually using it.
 RUN pecl install xdebug-2.9.0 \
   && docker-php-ext-enable xdebug \
   && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini

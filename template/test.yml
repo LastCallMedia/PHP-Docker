@@ -18,7 +18,7 @@ commandTests:
     args: ["-i"]
     expectedOutput:
       - memory_limit => 128M => 128M
-      - sendmail_path =>  -t -i  =>  -t -i
+      - sendmail_path => (?:\/usr\/sbin\/sendmail)? -t -i\s*=> (?:\/usr\/sbin\/sendmail)? -t -i
       - date.timezone => UTC => UTC
   - name: "Composer should work"
     command: composer
@@ -57,18 +57,27 @@ commandTests:
       - {key: XDEBUG_ENABLE, value: True }
       - {key: XDEBUG_REMOTE_HOST, value: foo.bar}
       - {key: XDEBUG_IDEKEY, value: foobar}
+{{ if .Env.XDEBUG_3 }}
+      - {key: XDEBUG_START_WITH_REQUEST, value: "yes"}
+{{ else }}
       - {key: XDEBUG_REMOTE_ENABLE, value: 1}
       - {key: XDEBUG_REMOTE_AUTOSTART, value: 1}
+{{ end }}
     expectedOutput:
+      - xdebug.idekey => foobar => foobar
+{{ if .Env.XDEBUG_3 }}
+      - xdebug.start_with_request => yes => yes
+      - xdebug.client_host => foo.bar => foo.bar
+{{ else }}
       - xdebug.remote_autostart => On => On
       - xdebug.remote_enable => On => On
       - xdebug.remote_host => foo.bar => foo.bar
-      - xdebug.idekey => foobar => foobar
+{{ end }}
   - name: "NodeJS Should be installed and in the correct version"
     command: "node"
     args: ["--version"]
     expectedOutput:
-      - v{{if (lt (atoi .Env.PHP_MINOR_VERSION) 4)}}10{{else}}14{{end}}.
+      - v{{ .Env.NODE_MAJOR_VERSION }}.
   - name: "Yarn should be installed and functional"
     command: "yarn"
     args: ["--version"]
