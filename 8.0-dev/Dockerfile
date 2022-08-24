@@ -120,6 +120,8 @@ RUN apt-get update \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # XDebug
+# TODO: Remove xdebug next time it causes problems. It is a lot of effort
+# to maintain, and no one is actually using it.
 RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
   && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
