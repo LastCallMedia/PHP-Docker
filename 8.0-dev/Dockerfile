@@ -117,7 +117,7 @@ RUN apt-get update \
   && echo "Package: nodejs\nPin: origin deb.nodesource.com\nPin-priority: 1000" > /etc/apt/preferences.d/99-nodejs \
   && apt-get install -y nodejs \
   && apt-get install -y --no-install-recommends yarn \
- \
+  && apt-get install -y python2.7 && npm config set python `which python2.7`  \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # XDebug
