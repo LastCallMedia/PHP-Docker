@@ -1,8 +1,0 @@
-# Allow overriding some settings to control performance.
-<IfModule mpm_prefork_module>
-	StartServers			 5
-	MinSpareServers		  5
-	MaxSpareServers		 10
-	MaxRequestWorkers	  {{ default .Env.APACHE_REQUEST_WORKERS "150" }}
-	MaxConnectionsPerChild   5000
-</IfModule>
