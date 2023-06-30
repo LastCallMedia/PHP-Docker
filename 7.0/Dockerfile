@@ -1,4 +1,4 @@
-FROM php:7.3-apache
+FROM php:7.0-apache
 
 # common-php70
 ENV DEBIAN_FRONTEND noninteractive
