@@ -63,7 +63,7 @@ commandTests:
     expectedOutput:
       - xdebug.idekey => foobar => foobar
 
-      - xdebug.start_with_request => yes => yes
+      - xdebug.start_with_request => default => default
       - xdebug.client_host => foo.bar => foo.bar
 
   - name: "NodeJS Should be installed and in the correct version"
