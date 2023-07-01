@@ -6,6 +6,8 @@ ENV APACHE_DOCROOT /var/www/html
 ENV PATH=/var/www/vendor/bin:$PATH
 ENV COMPOSER_MEMORY_LIMIT "-1"
 
+RUN apt-add-repository universe
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
       # for bz2
       bzip2 libbz2-dev \
@@ -117,7 +119,7 @@ RUN apt-get update \
   && echo "Package: nodejs\nPin: origin deb.nodesource.com\nPin-priority: 1000" > /etc/apt/preferences.d/99-nodejs \
   && apt-get install -y nodejs \
   && apt-get install -y --no-install-recommends yarn \
-  && apt-get install -y python && npm config set python `which python`  \
+  && apt-get install -y python2-minimal && npm config set python `which python2`  \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # XDebug
