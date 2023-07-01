@@ -58,15 +58,13 @@ commandTests:
       - {key: XDEBUG_REMOTE_HOST, value: foo.bar}
       - {key: XDEBUG_IDEKEY, value: foobar}
 
-      - {key: XDEBUG_REMOTE_ENABLE, value: 1}
-      - {key: XDEBUG_REMOTE_AUTOSTART, value: 1}
+      - {key: XDEBUG_START_WITH_REQUEST, value: "yes"}
 
     expectedOutput:
       - xdebug.idekey => foobar => foobar
 
-      - xdebug.remote_autostart => On => On
-      - xdebug.remote_enable => On => On
-      - xdebug.remote_host => foo.bar => foo.bar
+      - xdebug.start_with_request => yes => yes
+      - xdebug.client_host => foo.bar => foo.bar
 
   - name: "NodeJS Should be installed and in the correct version"
     command: "node"
