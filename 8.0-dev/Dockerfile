@@ -6,8 +6,6 @@ ENV APACHE_DOCROOT /var/www/html
 ENV PATH=/var/www/vendor/bin:$PATH
 ENV COMPOSER_MEMORY_LIMIT "-1"
 
-RUN apt-add-repository universe
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
       # for bz2
       bzip2 libbz2-dev \
