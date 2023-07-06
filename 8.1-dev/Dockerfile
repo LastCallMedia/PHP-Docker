@@ -117,10 +117,7 @@ RUN apt-get update \
   && echo "Package: nodejs\nPin: origin deb.nodesource.com\nPin-priority: 1000" > /etc/apt/preferences.d/99-nodejs \
   && apt-get install -y nodejs \
   && apt-get install -y --no-install-recommends yarn \
-  && curl -fsSOL http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tgz \
-  && tar zxpf Python-2.7.3.tgz && cd Python-2.7.3  \
-  && ./configure --prefix=/usr --enable-shared \
-  && make && make install \
+  && apt-get install -y python2-minimal && npm config set python `which python2`  \
   && npm config set python `which python2`  \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
