@@ -11,6 +11,7 @@ RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' \
            -e 's|security.debian.org|archive.debian.org/|g' \
            -e '/stretch-updates/d' /etc/apt/sources.list
 {{- end }}
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
       # for bz2
       bzip2 libbz2-dev \
