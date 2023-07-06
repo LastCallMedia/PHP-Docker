@@ -67,6 +67,7 @@ commandTests:
       - xdebug.remote_autostart => On => On
       - xdebug.remote_enable => On => On
       - xdebug.remote_host => foo.bar => foo.bar
+
   - name: "NodeJS Should be installed and in the correct version"
     command: "node"
     args: ["--version"]
