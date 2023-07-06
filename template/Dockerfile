@@ -7,6 +7,7 @@ ENV PATH=/var/www/vendor/bin:$PATH
 ENV COMPOSER_MEMORY_LIMIT "-1"
 
 {{- if (eq (.Env.PHP_VERSION) "7.0") }}
+
 # Update stretch repositories
 RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' \
            -e 's|security.debian.org|archive.debian.org/|g' \
