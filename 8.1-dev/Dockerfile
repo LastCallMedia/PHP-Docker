@@ -104,13 +104,11 @@ ADD scripts/* /usr/local/bin/
 # /common-php70
 
 # NodeJS + Yarn
-ARG NODE_MAJOR_VERSION=16
+ARG NODE_MAJOR_VERSION=20
 RUN apt-get update \
   && apt-get install -y apt-transport-https lsb-release gnupg > /dev/null 2>&1 \
-  && curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-  && echo "deb https://deb.nodesource.com/node_$NODE_MAJOR_VERSION.x $(lsb_release --codename | cut -f2) main" > /etc/apt/sources.list.d/nodesource.list \
-  && echo "deb-src https://deb.nodesource.com/node_$NODE_MAJOR_VERSION.x $(lsb_release --codename | cut -f2) main" >> /etc/apt/sources.list.d/nodesource.list \
+  && curl -sL "https://deb.nodesource.com/setup_$NODE_MAJOR_VERSION.x" | bash \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && apt-get update \
   # Force apt to use the deb.nodesource repository
