@@ -123,7 +123,7 @@ RUN apt-get update \
 # XDebug
 # TODO: Remove xdebug next time it causes problems. It is a lot of effort
 # to maintain, and no one is actually using it.
-RUN pecl install xdebug-2.9.0 \
+RUN pecl install xdebug-2.9.8 \
   && docker-php-ext-enable xdebug \
   && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini
 

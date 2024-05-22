@@ -6,6 +6,13 @@ ENV APACHE_DOCROOT /var/www/html
 ENV PATH=/var/www/vendor/bin:$PATH
 ENV COMPOSER_MEMORY_LIMIT "-1"
 
+{{- if (eq (.Env.PHP_VERSION) "7.0") }}
+
+# Update stretch repositories
+RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' \
+           -e 's|security.debian.org|archive.debian.org/|g' \
+           -e '/stretch-updates/d' /etc/apt/sources.list{{- end }}
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
       # for bz2
       bzip2 libbz2-dev \
@@ -123,7 +130,7 @@ RUN apt-get update \
 # XDebug
 # TODO: Remove xdebug next time it causes problems. It is a lot of effort
 # to maintain, and no one is actually using it.
-RUN pecl install xdebug{{ if not .Env.XDEBUG_3 }}-2.9.0{{ end }} \
+RUN pecl install xdebug{{ if not .Env.XDEBUG_3 }}-2.9.8{{ end }} \
   && docker-php-ext-enable xdebug \
 {{ if .Env.XDEBUG_3 }}  && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
 {{ else }}  && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini{{ end }}
