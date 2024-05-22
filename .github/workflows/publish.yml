@@ -23,6 +23,7 @@ jobs:
           - "8.0-dev"
           - "8.1"
           - "8.1-dev"
+          - "8.1-dev-node-20"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v1
