@@ -12,7 +12,7 @@ set -e
 # ./regenerate.sh
 #
 #####
-php_versions=('7.0' '7.1' '7.2' '7.3' '7.4' '8.0' '8.1')
+php_versions=('7.0' '7.1' '7.2' '7.3' '7.4' '8.0' '8.1', '8.2', '8.3')
 dc="version: '2'\nservices:\n"
 
 version_at_least () {

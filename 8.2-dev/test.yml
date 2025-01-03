@@ -70,7 +70,7 @@ commandTests:
     command: "node"
     args: ["--version"]
     expectedOutput:
-      - v20.
+      - v22.
   - name: "Yarn should be installed and functional"
     command: "yarn"
     args: ["--version"]
