@@ -138,11 +138,11 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION.(PHP_ZTS ? '-zts'
 
 # Terminus.
 ARG TERMINUS_VERSION=4.1.0
-ARG TERMINUS_SHA256="f8fd66afb825ba2314a3c1d9a0b0e7e3dedbe687668613bd511ff6b41c4c6516"
-RUN curl -fsSOL https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar \
-  && echo "$TERMINUS_SHA256 terminus.phar" | sha256sum -c - \
-  && mv terminus.phar /usr/local/bin/terminus \
-  && chmod +x /usr/local/bin/terminus
+RUN mkdir -p ~/terminus && cd ~/terminus \
+  && curl -L https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar --output terminus \
+  && chmod +x terminus \
+  && ./terminus self:update \
+  && sudo ln -s ~/terminus/terminus /usr/local/bin/terminus
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli
