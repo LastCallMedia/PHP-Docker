@@ -122,7 +122,7 @@ RUN set -eux; \
       > /etc/apt/sources.list.d/yarn.list; \
     \
     apt-get update; \
-    apt-get install -y --no-install-recommends nodejs yarn; \
+    apt-get install -y --no-install-recommends nodejs yarn;
 
 # Blackfire Probe. Note: We do not install Blackfire CLI. You will
 # need that in order to trigger Blackfire tests. The probe just instruments
