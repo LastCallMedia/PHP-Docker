@@ -142,7 +142,7 @@ RUN mkdir -p ~/terminus && cd ~/terminus
 RUN curl -L https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar --output terminus
 RUN chmod +x terminus
 RUN ./terminus self:update
-RUN sudo ln -s ~/terminus/terminus /usr/local/bin/terminus
+RUN ln -s ~/terminus/terminus /usr/local/bin/terminus
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli
