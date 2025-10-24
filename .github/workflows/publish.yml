@@ -9,16 +9,6 @@ jobs:
     strategy:
       matrix:
         version:
-          - "8.0"
-          - "8.0-dev"
-          - "8.1"
-          - "8.1-dev"
-          - "8.1-dev-node-20"
-          - "8.2"
-          - "8.2-dev"
-          - "8.3"
-          - "8.3-dev"
-          - "8.4"
           - "8.4-dev"
     steps:
       - name: Checkout Code

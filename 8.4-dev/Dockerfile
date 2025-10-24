@@ -105,26 +105,24 @@ ADD scripts/* /usr/local/bin/
 
 # NodeJS + Yarn
 ARG NODE_MAJOR_VERSION=23
-RUN apt-get update \
-  && apt-get install -y apt-transport-https lsb-release gnupg > /dev/null 2>&1 \
-  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-  && curl -sL "https://deb.nodesource.com/setup_$NODE_MAJOR_VERSION.x" | bash \
-  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-  && apt-get update \
-  # Force apt to use the deb.nodesource repository
-  && echo "Package: nodejs\nPin: origin deb.nodesource.com\nPin-priority: 1000" > /etc/apt/preferences.d/99-nodejs \
-  && apt-get install -y nodejs \
-  && apt-get install -y --no-install-recommends yarn \
- \
-  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# XDebug
-# TODO: Remove xdebug next time it causes problems. It is a lot of effort
-# to maintain, and no one is actually using it.
-RUN pecl install xdebug \
-  && docker-php-ext-enable xdebug \
-  && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
-
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends ca-certificates curl gnupg; \
+    mkdir -p /etc/apt/keyrings; \
+    \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+        | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg; \
+      echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR_VERSION}.x nodistro main" \
+        > /etc/apt/sources.list.d/nodesource.list; \
+    \
+    # Yarn repo key + repo (if you want yarn from apt)
+    curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg \
+      | gpg --dearmor -o /etc/apt/keyrings/yarn.gpg; \
+    echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian stable main" \
+      > /etc/apt/sources.list.d/yarn.list; \
+    \
+    apt-get update; \
+    apt-get install -y --no-install-recommends nodejs yarn; \
 
 # Blackfire Probe. Note: We do not install Blackfire CLI. You will
 # need that in order to trigger Blackfire tests. The probe just instruments
