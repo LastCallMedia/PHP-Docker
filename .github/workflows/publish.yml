@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         version:
+          - "8.4"
           - "8.4-dev"
     steps:
       - name: Checkout Code
