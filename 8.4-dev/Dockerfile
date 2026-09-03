@@ -138,7 +138,6 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION.(PHP_ZTS ? '-zts'
 
 # Terminus.
 ARG TERMINUS_VERSION=4.1.0
-ARG TERMINUS_VERSION=4.1.0
 RUN curl -fsSL \
     "https://github.com/pantheon-systems/terminus/releases/download/${TERMINUS_VERSION}/terminus.phar" \
     -o /usr/local/bin/terminus \
