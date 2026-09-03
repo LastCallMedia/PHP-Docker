@@ -138,11 +138,12 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION.(PHP_ZTS ? '-zts'
 
 # Terminus.
 ARG TERMINUS_VERSION=4.1.0
-RUN mkdir -p ~/terminus && cd ~/terminus
-RUN curl -L https://github.com/pantheon-systems/terminus/releases/download/$TERMINUS_VERSION/terminus.phar --output terminus
-RUN chmod +x terminus
-RUN ./terminus self:update
-RUN ln -s ~/terminus/terminus /usr/local/bin/terminus
+ARG TERMINUS_VERSION=4.1.0
+RUN curl -fsSL \
+    "https://github.com/pantheon-systems/terminus/releases/download/${TERMINUS_VERSION}/terminus.phar" \
+    -o /usr/local/bin/terminus \
+    && chmod +x /usr/local/bin/terminus \
+    && terminus --version  \
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli
