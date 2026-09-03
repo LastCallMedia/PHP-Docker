@@ -128,16 +128,17 @@ RUN pecl install xdebug \
   && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
 
 
-# Blackfire Probe. Note: We do not install Blackfire CLI. You will
-# need that in order to trigger Blackfire tests. The probe just instruments
-# things on the server side.
+# Blackfire Probe & CLI
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
     && mkdir -p /tmp/blackfire \
     && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
     && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
-    && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+    && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
+    && curl -o /usr/local/bin/blackfire https://blackfire.io/api/v1/releases/client/php/linux/amd64/$version \
+    && chmod + x /usr/local/bin/blackfire
+
 
 # Terminus.
 ARG TERMINUS_VERSION=2.2.0
