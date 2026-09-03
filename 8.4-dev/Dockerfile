@@ -104,7 +104,7 @@ ADD scripts/* /usr/local/bin/
 # /common-php70
 
 # NodeJS + Yarn
-ARG NODE_MAJOR_VERSION=23
+ARG NODE_MAJOR_VERSION=24
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends ca-certificates curl gnupg; \
