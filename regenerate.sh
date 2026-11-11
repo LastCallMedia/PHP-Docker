@@ -12,7 +12,7 @@ set -e
 # ./regenerate.sh
 #
 #####
-php_versions=('7.0' '7.1' '7.2' '7.3' '7.4' '8.0' '8.1', '8.2', '8.3', '8.4')
+php_versions=('7.0' '7.1' '7.2' '7.3' '7.4' '8.0' '8.1' '8.2' '8.3' '8.4')
 dc="services:\n"
 
 version_at_least () {
@@ -38,9 +38,9 @@ for PHP_VERSION in "${php_versions[@]}"; do
   # Determine node version
   if version_at_least "$PHP_VERSION" "8.4"; then
     node_version=23
-  if version_at_least "$PHP_VERSION" "8.3"; then
+  elif version_at_least "$PHP_VERSION" "8.3"; then
     node_version=23
-  if version_at_least "$PHP_VERSION" "8.2"; then
+  elif version_at_least "$PHP_VERSION" "8.2"; then
     node_version=22
   elif version_at_least "$PHP_VERSION" "7.4"; then
     node_version=14
