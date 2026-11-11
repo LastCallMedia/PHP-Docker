@@ -50,7 +50,7 @@ jobs:
           IMG=$(docker run --platform ${{ matrix.platform }} -d -p 8080:80 lastcallmedia/php:${{ matrix.version }})
           trap 'docker logs "$IMG"; docker stop "$IMG"' EXIT
           docker exec "$IMG" sh -c 'echo healthy > /var/www/html/healthcheck.txt'
-          curl --fail --retry 20 --retry-connrefused --retry-delay 2 http://localhost:8080/healthcheck.txt
+          curl --fail --retry 20 --retry-all-errors --retry-delay 2 --connect-timeout 5 --max-time 10 http://localhost:8080/healthcheck.txt
   check-template:
     runs-on: ubuntu-latest
     steps:
