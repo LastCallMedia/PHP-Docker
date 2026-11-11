@@ -37,7 +37,7 @@ for PHP_VERSION in "${php_versions[@]}"; do
 
   # Determine node version
   if version_at_least "$PHP_VERSION" "8.4"; then
-    node_version=23
+    node_version=24
   elif version_at_least "$PHP_VERSION" "8.3"; then
     node_version=23
   elif version_at_least "$PHP_VERSION" "8.2"; then
