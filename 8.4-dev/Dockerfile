@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN docker-php-ext-configure gd  \
-    && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
+    && docker-php-ext-configure ldap --with-libdir="lib/$(dpkg-architecture --query DEB_HOST_MULTIARCH)" \
     && docker-php-ext-install -j$(nproc) \
       bcmath \
       bz2 \
@@ -142,7 +142,7 @@ RUN curl -fsSL \
     "https://github.com/pantheon-systems/terminus/releases/download/${TERMINUS_VERSION}/terminus.phar" \
     -o /usr/local/bin/terminus \
     && chmod +x /usr/local/bin/terminus \
-    && terminus --version  \
+    && terminus --version
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli

@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN docker-php-ext-configure gd {{if (not (atoi .Env.PHP_AT_LEAST_7_4))}}--with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/{{ end }} \
-    && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
+    && docker-php-ext-configure ldap --with-libdir="lib/$(dpkg-architecture --query DEB_HOST_MULTIARCH)" \
     && docker-php-ext-install -j$(nproc) \
       bcmath \
       bz2 \
