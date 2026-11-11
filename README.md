@@ -10,6 +10,17 @@ They all offer the following tools:
 * Composer
 * Drush Launcher
 
+Image architectures
+-------------------
+The `8.4` and `8.4-dev` tags are built and tested for `linux/amd64` and
+`linux/arm64`. Docker automatically selects the platform for the host, including
+Apple Silicon Macs; a Lando `platform: linux/amd64` override is unnecessary with
+these multi-platform images.
+
+Publishing a change to `master` runs the image tests for both architectures before
+updating the Docker Hub tags. Each release also has an immutable source tag,
+`8.4-<git-sha>` or `8.4-dev-<git-sha>`, for selecting a specific build.
+
 Environment Variables
 ---------------------
 APACHE_DOCROOT (/var/www/html): The path to the docroot. To avoid configuration issues, keep your docroot below /var/www. If you change this, you will also want to change the working directory using the -w flag so when you use exec, you drop into the correct directory.

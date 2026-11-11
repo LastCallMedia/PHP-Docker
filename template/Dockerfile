@@ -84,6 +84,25 @@ RUN COMPOSER_SHA384=$(curl https://composer.github.io/installer.sig) \
   && echo "$COMPOSER_SHA384 composer-setup.php" | sha384sum -c - \
   && php composer-setup.php --version=$COMPOSER_VERSION --install-dir=/usr/local/bin --filename=composer
 
+{{ if eq .Env.PHP_VERSION "8.4" -}}
+# Install Dockerize for the image architecture.
+ARG DOCKERIZE_VERSION=v0.16.0
+ARG DOCKERIZE_SHA256_AMD64=1c6d8cf10cfd764fbb58f4600b477bd4f90d65b5505fca2e3474f3176756f434
+ARG DOCKERIZE_SHA256_ARM64=b001afe99ea44abd47d460442ec1f24ddb042f6412aa4ead19c9199d8b321d29
+RUN set -eux; \
+    architecture="$(dpkg --print-architecture)"; \
+    case "$architecture" in \
+      amd64) checksum="$DOCKERIZE_SHA256_AMD64" ;; \
+      arm64) checksum="$DOCKERIZE_SHA256_ARM64" ;; \
+      *) echo "Unsupported Dockerize architecture: $architecture" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-linux-${architecture}-${DOCKERIZE_VERSION}.tar.gz" -o /tmp/dockerize.tar.gz; \
+    echo "$checksum  /tmp/dockerize.tar.gz" | sha256sum -c -; \
+    tar -xzf /tmp/dockerize.tar.gz -C /usr/local/bin; \
+    rm /tmp/dockerize.tar.gz; \
+    dockerize -version
+
+{{ else -}}
 # Install Dockerize.
 ARG DOCKERIZE_VERSION=v0.6.1
 ARG DOCKERIZE_SHA256=1fa29cd41a5854fd5423e242f3ea9737a50a8c3bcf852c9e62b9eb02c6ccd370
@@ -92,6 +111,7 @@ RUN curl -fsSOL https://github.com/jwilder/dockerize/releases/download/$DOCKERIZ
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
+{{ end -}}
 # Install Drush Launcher. Whereas previously we installed Drush globally, we no longer do,
 # since it's expected that D8 sites will include their own copy of Drush, and Drush 9+ is
 # incompatible with Drupal < 8.
@@ -194,12 +214,13 @@ RUN pecl install xdebug{{ if not .Env.XDEBUG_3 }}-2.9.0{{ end }} \
 # things on the server side.
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION.(PHP_ZTS ? '-zts' : '');") \
     && architecture=$(uname -m) \
-    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/$architecture/$version \
+    && curl -fsSL -A "Docker" -o /tmp/blackfire-probe.tar.gz https://blackfire.io/api/v1/releases/probe/php/linux/$architecture/$version \
     && mkdir -p /tmp/blackfire \
     && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
     && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get ('extension_dir');")/blackfire.so \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
-    && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+    && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz \
+    && php --ri blackfire
 
 # Terminus.
 ARG TERMINUS_VERSION={{ .Env.TERMINUS_VERSION }}

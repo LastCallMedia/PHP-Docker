@@ -28,6 +28,13 @@ commandTests:
     args: ["--drush-launcher-version"]
     expectedOutput:
       - "Drush Launcher Version: 0.6.0"
+{{if eq .Env.PHP_VERSION "8.4"}}
+  - name: "Dockerize should execute on the image architecture"
+    command: dockerize
+    args: ["-version"]
+    expectedOutput:
+      - "v0.16.0"
+{{end -}}
 {{if .Env.IS_DEV}}
   - name: "Blackfire agent should be present and configured"
     command: "php"
