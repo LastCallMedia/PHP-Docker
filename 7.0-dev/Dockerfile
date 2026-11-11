@@ -6,6 +6,11 @@ ENV APACHE_DOCROOT /var/www/html
 ENV PATH=/var/www/vendor/bin:$PATH
 ENV COMPOSER_MEMORY_LIMIT "-1"
 
+# Update stretch repositories
+RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' \
+           -e 's|security.debian.org|archive.debian.org/|g' \
+           -e '/stretch-updates/d' /etc/apt/sources.list
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
       # for bz2
       bzip2 libbz2-dev \
@@ -38,7 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
+    && docker-php-ext-configure ldap --with-libdir="lib/$(dpkg-architecture --query DEB_HOST_MULTIARCH)" \
     && docker-php-ext-install -j$(nproc) \
       bcmath \
       bz2 \
@@ -103,6 +108,7 @@ ADD scripts/* /usr/local/bin/
 
 # /common-php70
 
+
 # NodeJS + Yarn
 ARG NODE_MAJOR_VERSION=10
 RUN apt-get update \
@@ -127,6 +133,8 @@ RUN pecl install xdebug-2.9.0 \
   && docker-php-ext-enable xdebug \
   && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini
 
+
+
 # Blackfire Probe. Note: We do not install Blackfire CLI. You will
 # need that in order to trigger Blackfire tests. The probe just instruments
 # things on the server side.
@@ -145,6 +153,7 @@ RUN curl -fsSOL https://github.com/pantheon-systems/terminus/releases/download/$
   && echo "$TERMINUS_SHA256 terminus.phar" | sha256sum -c - \
   && mv terminus.phar /usr/local/bin/terminus \
   && chmod +x /usr/local/bin/terminus
+
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli

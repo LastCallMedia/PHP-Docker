@@ -103,6 +103,7 @@ ADD scripts/* /usr/local/bin/
 
 # /common-php70
 
+
 # NodeJS + Yarn
 ARG NODE_MAJOR_VERSION=24
 RUN set -eux; \
@@ -124,6 +125,8 @@ RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends nodejs yarn;
 
+
+
 # Blackfire Probe. Note: We do not install Blackfire CLI. You will
 # need that in order to trigger Blackfire tests. The probe just instruments
 # things on the server side.
@@ -143,6 +146,7 @@ RUN curl -fsSL \
     -o /usr/local/bin/terminus \
     && chmod +x /usr/local/bin/terminus \
     && terminus --version
+
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli

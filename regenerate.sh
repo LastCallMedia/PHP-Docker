@@ -42,6 +42,8 @@ for PHP_VERSION in "${php_versions[@]}"; do
     node_version=23
   elif version_at_least "$PHP_VERSION" "8.2"; then
     node_version=22
+  elif version_at_least "$PHP_VERSION" "8.0"; then
+    node_version=16
   elif version_at_least "$PHP_VERSION" "7.4"; then
     node_version=14
   else
@@ -58,7 +60,10 @@ for PHP_VERSION in "${php_versions[@]}"; do
   fi
 
   # Determine terminus version
-  if version_at_least "$PHP_VERSION" "8.0"; then
+  if version_at_least "$PHP_VERSION" "8.4"; then
+    terminus_version="4.1.0"
+    terminus_sha=""
+  elif version_at_least "$PHP_VERSION" "8.0"; then
     terminus_version="3.0.7"
     terminus_sha="f8fd66afb825ba2314a3c1d9a0b0e7e3dedbe687668613bd511ff6b41c4c6516"
   else
