@@ -1,4 +1,5 @@
 name: 'Container Structure Tests'
+description: 'Run a checksum-verified native Container Structure Test binary'
 inputs:
   image:
     description: 'The Docker image to test'
@@ -7,13 +8,37 @@ inputs:
     description: 'Path to the config file'
     default: 'test.yaml'
 runs:
-  using: 'docker'
-  image: 'gcr.io/gcp-runtimes/container-structure-test:latest'
-  args:
-    - test
-    - --image
-    - ${{ inputs.image }}
-    - --config
-    - ${{ inputs.config }}
-    - --save
-
+  using: 'composite'
+  steps:
+    - name: Install native test runner
+      shell: bash
+      env:
+        CONTAINER_STRUCTURE_TEST_VERSION: v1.22.1
+      run: |
+        set -euo pipefail
+        case "$(uname -m)" in
+          x86_64)
+            architecture=amd64
+            checksum=fa35e89512a8978585f76cf41397956d2e3a30c62c2ad3fb857b1597074d14ca
+            ;;
+          aarch64|arm64)
+            architecture=arm64
+            checksum=801826ed107222120eb6df8c143b7de752cfebbe3aebfeea576e7098486917c2
+            ;;
+          *) echo "Unsupported test runner architecture: $(uname -m)" >&2; exit 1 ;;
+        esac
+        binary="$RUNNER_TEMP/container-structure-test"
+        curl -fsSL --retry 3 \
+          "https://github.com/GoogleContainerTools/container-structure-test/releases/download/${CONTAINER_STRUCTURE_TEST_VERSION}/container-structure-test-linux-${architecture}" \
+          -o "$binary"
+        echo "$checksum  $binary" | sha256sum -c -
+        chmod +x "$binary"
+    - name: Test image
+      shell: bash
+      env:
+        TEST_IMAGE: ${{ inputs.image }}
+        TEST_CONFIG: ${{ inputs.config }}
+      run: |
+        "$RUNNER_TEMP/container-structure-test" test \
+          --image "$TEST_IMAGE" \
+          --config "$TEST_CONFIG"

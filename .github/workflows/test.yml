@@ -23,8 +23,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build Image
@@ -37,14 +35,10 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.version }}-${{ matrix.platform }}
           cache-to: type=gha,mode=max,scope=${{ matrix.version }}-${{ matrix.platform }}
       - name: Unit Test Image
-        # The test runner is AMD64-only; test images run on the native host.
-        run: |
-          docker run --rm --platform linux/amd64 \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v "$GITHUB_WORKSPACE:/workspace:ro" \
-            gcr.io/gcp-runtimes/container-structure-test:latest test \
-            --image lastcallmedia/php:${{ matrix.version }} \
-            --config /workspace/${{ matrix.version }}/test.yml
+        uses: ./.github/actions/container-structure-test
+        with:
+          image: lastcallmedia/php:${{ matrix.version }}
+          config: ./${{ matrix.version }}/test.yml
       - name: "Verify image starts Apache"
         run: |
           IMG=$(docker run --platform ${{ matrix.platform }} -d -p 8080:80 lastcallmedia/php:${{ matrix.version }})
