@@ -2,9 +2,14 @@ name: Publish
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
+  test:
+    uses: ./.github/workflows/test.yml
   publish:
+    needs: test
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -13,10 +18,25 @@ jobs:
           - "8.4-dev"
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v6
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
       - name: Docker Hub Login
-        run: docker login -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PASSWORD}}
-      - name: Build Image
-        run: docker build -t lastcallmedia/php:${{ matrix.version }} ./${{ matrix.version }}
-      - name: Push Image
-        run: docker push lastcallmedia/php:${{ matrix.version }}
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      - name: Build and Push Image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./${{ matrix.version }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            lastcallmedia/php:${{ matrix.version }}
+            lastcallmedia/php:${{ matrix.version }}-${{ github.sha }}
+          cache-from: |
+            type=gha,scope=${{ matrix.version }}-linux/amd64
+            type=gha,scope=${{ matrix.version }}-linux/arm64

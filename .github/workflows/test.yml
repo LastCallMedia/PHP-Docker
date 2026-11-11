@@ -1,37 +1,61 @@
 name: Test
 on:
   push:
-    branches-ignore: master
+    branches-ignore: [master]
+  pull_request:
+  workflow_call:
 
 jobs:
   test-image:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         version:
           - "8.4"
           - "8.4-dev"
+        platform: [linux/amd64, linux/arm64]
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v6
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
       - name: Build Image
-        run: docker build -t lastcallmedia/php:${{ matrix.version }} ./${{ matrix.version }}
-      - name: Unit Test Image
-        uses: ./.github/actions/container-structure-test
+        uses: docker/build-push-action@v7
         with:
-          image: lastcallmedia/php:${{ matrix.version }}
-          config: ./${{ matrix.version }}/test.yml
+          context: ./${{ matrix.version }}
+          platforms: ${{ matrix.platform }}
+          load: true
+          tags: lastcallmedia/php:${{ matrix.version }}
+          cache-from: type=gha,scope=${{ matrix.version }}-${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.version }}-${{ matrix.platform }}
+      - name: Unit Test Image
+        # The test runner is AMD64-only; test images run on the native host.
+        run: |
+          docker run --rm --platform linux/amd64 \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$GITHUB_WORKSPACE:/workspace:ro" \
+            gcr.io/gcp-runtimes/container-structure-test:latest test \
+            --image lastcallmedia/php:${{ matrix.version }} \
+            --config /workspace/${{ matrix.version }}/test.yml
       - name: "Verify image starts Apache"
         run: |
-          IMG=$(docker run -d -p 8080:80 lastcallmedia/php:${{ matrix.version }})
-          sleep 3
-          curl -I http://localhost:8080
-          docker stop $IMG
+          IMG=$(docker run --platform ${{ matrix.platform }} -d -p 8080:80 lastcallmedia/php:${{ matrix.version }})
+          trap 'docker logs "$IMG"; docker stop "$IMG"' EXIT
+          docker exec "$IMG" sh -c 'echo healthy > /var/www/html/healthcheck.txt'
+          curl --fail --retry 20 --retry-connrefused --retry-delay 2 http://localhost:8080/healthcheck.txt
   check-template:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v6
       - name: Setup dockerize
         uses: zcong1993/setup-dockerize@v1.2.2
         with:
