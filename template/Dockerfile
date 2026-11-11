@@ -6,7 +6,7 @@ ENV APACHE_DOCROOT /var/www/html
 ENV PATH=/var/www/vendor/bin:$PATH
 ENV COMPOSER_MEMORY_LIMIT "-1"
 
-{{- if (-eq (.Env.PHP_VERSION) "7.0") }}
+{{- if eq .Env.PHP_VERSION "7.0" }}
 
 # Update stretch repositories
 RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' \
@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN docker-php-ext-configure gd {{if (not (atoi .Env.PHP_AT_LEAST_7_4))}}--with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/{{ end }} \
-    && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
+    && docker-php-ext-configure ldap --with-libdir="lib/$(dpkg-architecture --query DEB_HOST_MULTIARCH)" \
     && docker-php-ext-install -j$(nproc) \
       bcmath \
       bz2 \
@@ -110,6 +110,58 @@ ADD scripts/* /usr/local/bin/
 
 # /common-php70
 {{ if .Env.IS_DEV }}
+{{ if eq .Env.PHP_VERSION "8.4" -}}
+# XDebug
+RUN pecl install xdebug \
+  && docker-php-ext-enable xdebug \
+  && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
+
+# NodeJS + Yarn
+ARG NODE_MAJOR_VERSION={{ .Env.NODE_MAJOR_VERSION }}
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends ca-certificates curl gnupg; \
+    mkdir -p /etc/apt/keyrings; \
+    \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+        | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg; \
+      echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR_VERSION}.x nodistro main" \
+        > /etc/apt/sources.list.d/nodesource.list; \
+    \
+    # Yarn repo key + repo (if you want yarn from apt)
+    curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg \
+      | gpg --dearmor -o /etc/apt/keyrings/yarn.gpg; \
+    echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian stable main" \
+      > /etc/apt/sources.list.d/yarn.list; \
+    \
+    apt-get update; \
+    apt-get install -y --no-install-recommends nodejs yarn;
+
+{{ else if or (eq .Env.PHP_VERSION "8.3") (eq .Env.PHP_VERSION "8.2") }}
+# NodeJS + Yarn
+ARG NODE_MAJOR_VERSION={{ .Env.NODE_MAJOR_VERSION }}
+RUN apt-get update \
+  && apt-get install -y apt-transport-https lsb-release gnupg > /dev/null 2>&1 \
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  && curl -sL "https://deb.nodesource.com/setup_$NODE_MAJOR_VERSION.x" | bash \
+  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+  && apt-get update \
+  # Force apt to use the deb.nodesource repository
+  && echo "Package: nodejs\nPin: origin deb.nodesource.com\nPin-priority: 1000" > /etc/apt/preferences.d/99-nodejs \
+  && apt-get install -y nodejs \
+  && apt-get install -y --no-install-recommends yarn \
+ \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# XDebug
+# TODO: Remove xdebug next time it causes problems. It is a lot of effort
+# to maintain, and no one is actually using it.
+RUN pecl install xdebug \
+  && docker-php-ext-enable xdebug \
+  && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
+
+
+{{ else }}
 # NodeJS + Yarn
 ARG NODE_MAJOR_VERSION={{ .Env.NODE_MAJOR_VERSION }}
 RUN apt-get update \
@@ -135,6 +187,29 @@ RUN pecl install xdebug{{ if not .Env.XDEBUG_3 }}-2.9.0{{ end }} \
 {{ if .Env.XDEBUG_3 }}  && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
 {{ else }}  && echo "xdebug.default_enable=0\nxdebug.coverage_enable=0" > $PHP_INI_DIR/conf.d/xdebug.ini{{ end }}
 
+{{ end }}
+{{ if eq .Env.PHP_VERSION "8.4" }}
+# Blackfire Probe. Note: We do not install Blackfire CLI. You will
+# need that in order to trigger Blackfire tests. The probe just instruments
+# things on the server side.
+RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION.(PHP_ZTS ? '-zts' : '');") \
+    && architecture=$(uname -m) \
+    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/$architecture/$version \
+    && mkdir -p /tmp/blackfire \
+    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
+    && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get ('extension_dir');")/blackfire.so \
+    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
+    && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+
+# Terminus.
+ARG TERMINUS_VERSION={{ .Env.TERMINUS_VERSION }}
+RUN curl -fsSL \
+    "https://github.com/pantheon-systems/terminus/releases/download/${TERMINUS_VERSION}/terminus.phar" \
+    -o /usr/local/bin/terminus \
+    && chmod +x /usr/local/bin/terminus \
+    && terminus --version
+
+{{ else }}
 # Blackfire Probe. Note: We do not install Blackfire CLI. You will
 # need that in order to trigger Blackfire tests. The probe just instruments
 # things on the server side.
@@ -154,6 +229,7 @@ RUN curl -fsSOL https://github.com/pantheon-systems/terminus/releases/download/$
   && mv terminus.phar /usr/local/bin/terminus \
   && chmod +x /usr/local/bin/terminus
 
+{{ end }}
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli
 

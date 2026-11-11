@@ -12,8 +12,8 @@ set -e
 # ./regenerate.sh
 #
 #####
-php_versions=('7.0' '7.1' '7.2' '7.3' '7.4' '8.0' '8.1', '8.2', '8.3', '8.4')
-dc="version: '2'\nservices:\n"
+php_versions=('7.0' '7.1' '7.2' '7.3' '7.4' '8.0' '8.1' '8.2' '8.3' '8.4')
+dc="services:\n"
 
 version_at_least () {
   a_major=$(echo "$1" | awk -F'.' '{ print $1 }')
@@ -37,11 +37,13 @@ for PHP_VERSION in "${php_versions[@]}"; do
 
   # Determine node version
   if version_at_least "$PHP_VERSION" "8.4"; then
+    node_version=24
+  elif version_at_least "$PHP_VERSION" "8.3"; then
     node_version=23
-  if version_at_least "$PHP_VERSION" "8.3"; then
-    node_version=23
-  if version_at_least "$PHP_VERSION" "8.2"; then
+  elif version_at_least "$PHP_VERSION" "8.2"; then
     node_version=22
+  elif version_at_least "$PHP_VERSION" "8.0"; then
+    node_version=16
   elif version_at_least "$PHP_VERSION" "7.4"; then
     node_version=14
   else
@@ -58,7 +60,10 @@ for PHP_VERSION in "${php_versions[@]}"; do
   fi
 
   # Determine terminus version
-  if version_at_least "$PHP_VERSION" "8.0"; then
+  if version_at_least "$PHP_VERSION" "8.4"; then
+    terminus_version="4.1.0"
+    terminus_sha=""
+  elif version_at_least "$PHP_VERSION" "8.0"; then
     terminus_version="3.0.7"
     terminus_sha="f8fd66afb825ba2314a3c1d9a0b0e7e3dedbe687668613bd511ff6b41c4c6516"
   else

@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN docker-php-ext-configure gd  \
-    && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu \
+    && docker-php-ext-configure ldap --with-libdir="lib/$(dpkg-architecture --query DEB_HOST_MULTIARCH)" \
     && docker-php-ext-install -j$(nproc) \
       bcmath \
       bz2 \
@@ -103,6 +103,11 @@ ADD scripts/* /usr/local/bin/
 
 # /common-php70
 
+# XDebug
+RUN pecl install xdebug \
+  && docker-php-ext-enable xdebug \
+  && echo "xdebug.mode=debug" > $PHP_INI_DIR/conf.d/xdebug.ini
+
 # NodeJS + Yarn
 ARG NODE_MAJOR_VERSION=24
 RUN set -eux; \
@@ -124,6 +129,8 @@ RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends nodejs yarn;
 
+
+
 # Blackfire Probe. Note: We do not install Blackfire CLI. You will
 # need that in order to trigger Blackfire tests. The probe just instruments
 # things on the server side.
@@ -133,7 +140,7 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION.(PHP_ZTS ? '-zts'
     && mkdir -p /tmp/blackfire \
     && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
     && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get ('extension_dir');")/blackfire.so \
-    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8307\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
+    && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
 # Terminus.
@@ -142,7 +149,8 @@ RUN curl -fsSL \
     "https://github.com/pantheon-systems/terminus/releases/download/${TERMINUS_VERSION}/terminus.phar" \
     -o /usr/local/bin/terminus \
     && chmod +x /usr/local/bin/terminus \
-    && terminus --version  \
+    && terminus --version
+
 
 # Gulp-cli.
 RUN npm i --no-cache -g gulp-cli
